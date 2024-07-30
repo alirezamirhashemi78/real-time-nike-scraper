@@ -13,7 +13,7 @@ import orjson
 
 class TYPES(enum.Enum):
     NONE = 0
-    SET_PAGES = 1
+    SET_URL = 1
     PRODUCT = 2
     REVIEW = 3
     SAVE_REVIEW = 4
@@ -101,6 +101,19 @@ class NikeThread(threading.Thread):
                 NikeThread.threads_pages_url.append(url.format(anchor=(i*48) - ((i*48) - NikeThread.products_count), count=48))
 
 
+    def set_reviews_url(self):
+        reviews_sample_url = str = "https://cdn-ws.turnto.com/v5/sitedata/78GDJmj4zEDYwwHsite/{p_id}/d/review/en_GB/0/50/%7B%7D/LOCAL/true/true/?"  
+        NikeThread.threads_reviews_url.extend(
+            [
+                {
+                    "url": reviews_sample_url.format(p_id=product["url"].split("/")[-1].split("-")[0]), 
+                    "cloudProductId": product["cloudProductId"] 
+                }
+                for product in NikeThread.products
+            ]
+        )
+
+
     def retrive_product(self):
         url: str = self.t_catch
         response = requests.get(url, headers=self.headers)
@@ -115,34 +128,8 @@ class NikeThread(threading.Thread):
         ids = [product["cloudProductId"] for product in data]
         NikeThread.products_id.extend(ids)
         NikeThread.products_id = list(set(NikeThread.products_id))
-        
-        # TODO: this part of function have to set on another function for 'set reviews':
-        # reviews_sample_url = str = "https://cdn-ws.turnto.com/v5/sitedata/78GDJmj4zEDYwwHsite/{p_id}/d/review/en_GB/0/50/%7B%7D/LOCAL/true/true/?"  
-        # NikeThread.threads_reviews_url.extend(
-        #     [
-        #         {
-        #             "url": reviews_sample_url.format(p_id=product["url"].split("/")[-1].split("-")[0]), 
-        #             "cloudProductId": product["cloudProductId"] 
-        #         }
-        #         for product in NikeThread.products
-        #     ]
-        # )
+
         print("LEN PRODUCTS: ", len(NikeThread.products))
-    
-
-
-    def set_reviews_url(self):
-        reviews_sample_url = str = "https://cdn-ws.turnto.com/v5/sitedata/78GDJmj4zEDYwwHsite/{p_id}/d/review/en_GB/0/50/%7B%7D/LOCAL/true/true/?"  
-        NikeThread.threads_reviews_url.extend(
-            [
-                {
-                    "url": reviews_sample_url.format(p_id=product["url"].split("/")[-1].split("-")[0]), 
-                    "cloudProductId": product["cloudProductId"] 
-                }
-                for product in NikeThread.products
-            ]
-        )
-
 
 
     def retrive_review(self):
@@ -160,12 +147,16 @@ class NikeThread(threading.Thread):
 
         match self.t_type:
 
-            case TYPES.SET_PAGES:
+            case TYPES.SET_URL:
                 if NikeThread.products_count == 0:
                     self.set_products_count()
                     print("P COUNT: ", NikeThread.products_count)
-                elif len(NikeThread.threads_pages_url) == 0:
+
+                if len(NikeThread.threads_pages_url) == 0:
                     self.set_pages_url()
+
+                if NikeThread.products:
+                    self.set_reviews_url()
                     
 
             case TYPES.PRODUCT:
@@ -188,8 +179,8 @@ class NikeThread(threading.Thread):
                             print("ERROR in func:<run> 1")
             
 
-            case TYPES.SET_REVIEW:
-                self.set_reviews_url()
+            # case TYPES.SET_REVIEW:
+            #     self.set_reviews_url()
 
 
             case TYPES.REVIEW:

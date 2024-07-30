@@ -18,14 +18,16 @@ if __name__ == "__main__":
 
         t_id += 1
 
-        for i in range(2):
-            set_products_thread = Th.NikeThread(
+        # for setting pages url and pages count
+        for i in range(3):
+            set_urls_thread = Th.NikeThread(
                 t_id=1,
-                t_type=Th.TYPES.SET_PAGES,
+                t_type=Th.TYPES.SET_URL,
                 t_catch = None
             )
-            set_products_thread.start()
-            set_products_thread.join()
+            set_urls_thread.start()
+            set_urls_thread.join()
+
 
         if threads_pages_url:
             for _ in range(7):
@@ -46,21 +48,23 @@ if __name__ == "__main__":
             print("no page added !")  
         time.sleep(1)
 
+
+        # for setting the reviews url:
         for _ in range(4):
             if nikeThread.products:
                 # print("main: threads_review_products: ", len(nikeThread.threads_review_products))
-
-                set_review_thread = Th.NikeThread(
-                    t_id=t_id,
-                    t_type=Th.TYPES.SET_REVIEW,
+                set_urls_thread = Th.NikeThread(
+                    t_id=1,
+                    t_type=Th.TYPES.SET_URL,
                     t_catch = None
                 )
-                set_review_thread.start()
+                set_urls_thread.start()
+                set_urls_thread.join()
             else:
                 pass
         time.sleep(0.2)
         
-        # for i in range(len(nikeThread.threads_reviews_url)):
+
         for i in range(200):
             if nikeThread.threads_reviews_url:
                 obj = nikeThread.threads_reviews_url.pop()
