@@ -44,10 +44,8 @@ class NikeThread(threading.Thread):
 
     products_count: int = 0
     threads_pages_url: list = []
-    threads_products: list = []
     threads_review_products: list = []
     threads_reviews_url: list = []
-    threads_reviews: list = []
     products_id: list = []
     products: list = []
     reviews: list = []
@@ -81,11 +79,6 @@ class NikeThread(threading.Thread):
                 content = NikeThread.load_data(file_name)
                 data.extend(content)
 
-        # if type(data) == dict:
-        #     items.append(data)
-        # elif type(data) == list:
-        #     items.extend(data)
-
         with threading.Lock():
             with open(file_name, "w") as f:
                 json.dump(data, f)
@@ -117,13 +110,28 @@ class NikeThread(threading.Thread):
             product for product in data
             if product["cloudProductId"] not in NikeThread.products_id
         ]
-        NikeThread.threads_products.extend(products)
+        NikeThread.products.extend(products)
 
         ids = [product["cloudProductId"] for product in data]
         NikeThread.products_id.extend(ids)
         NikeThread.products_id = list(set(NikeThread.products_id))
         
         # TODO: this part of function have to set on another function for 'set reviews':
+        # reviews_sample_url = str = "https://cdn-ws.turnto.com/v5/sitedata/78GDJmj4zEDYwwHsite/{p_id}/d/review/en_GB/0/50/%7B%7D/LOCAL/true/true/?"  
+        # NikeThread.threads_reviews_url.extend(
+        #     [
+        #         {
+        #             "url": reviews_sample_url.format(p_id=product["url"].split("/")[-1].split("-")[0]), 
+        #             "cloudProductId": product["cloudProductId"] 
+        #         }
+        #         for product in NikeThread.products
+        #     ]
+        # )
+        print("LEN PRODUCTS: ", len(NikeThread.products))
+    
+
+
+    def set_reviews_url(self):
         reviews_sample_url = str = "https://cdn-ws.turnto.com/v5/sitedata/78GDJmj4zEDYwwHsite/{p_id}/d/review/en_GB/0/50/%7B%7D/LOCAL/true/true/?"  
         NikeThread.threads_reviews_url.extend(
             [
@@ -131,27 +139,10 @@ class NikeThread(threading.Thread):
                     "url": reviews_sample_url.format(p_id=product["url"].split("/")[-1].split("-")[0]), 
                     "cloudProductId": product["cloudProductId"] 
                 }
-                for product in products
+                for product in NikeThread.products
             ]
         )
-        print("LEN PRODUCTS: ", len(NikeThread.threads_products))
-    
 
-    # def save_products(self, size):
-    #     products = [
-    #         pr for _ in range(size) if NikeThread.threads_products and (pr := NikeThread.threads_products.pop()) not in NikeThread.products
-    #     ] 
-
-    #     NikeThread.products.extend(products)
-
-    #     NikeThread.save_data(NikeThread.threads_products, file_name=f"products.json")
-        
-        # with open("products.json", "w") as f:
-        #     json.dump(NikeThread.products, f)
-        # return   
-
-    def set_reviews_url(self):
-        pass
 
 
     def retrive_review(self):
@@ -162,22 +153,8 @@ class NikeThread(threading.Thread):
         headers["user-agent"] = ua.random
         response = NikeThread.session.get(url, headers=headers)
         reviews = {"cloudProductId": c_id, "response": response.json()}
-        NikeThread.threads_reviews.append(reviews)
+        NikeThread.reviews.append(reviews)
     
-
-    # def save_reviews(self, size):
-    #     reviews = [
-    #         rw for _ in range(size) if NikeThread.threads_reviews and (rw := NikeThread.threads_reviews.pop()) not in NikeThread.reviews 
-    #     ]
-    #     NikeThread.reviews.extend(reviews)
-
-    #     NikeThread.save_data(NikeThread.reviews, file_name="reviews.json")
-
-        # with open("reviews.json", "w") as f:
-        #     json.dump(NikeThread.reviews, f)
-        # return        
-        # print("------------------------SAVED------------------------")
-
 
     def run(self):
 
@@ -187,7 +164,7 @@ class NikeThread(threading.Thread):
                 if NikeThread.products_count == 0:
                     self.set_products_count()
                     print("P COUNT: ", NikeThread.products_count)
-                else:
+                elif len(NikeThread.threads_pages_url) == 0:
                     self.set_pages_url()
                     
 
@@ -197,41 +174,42 @@ class NikeThread(threading.Thread):
                 size = 500
                 # creating template size with range 140 for saving each 1000 product (the number is changable by variable 'size')
                 # i had to add range to it because the absoulute size  may passed by the threades cause of their speeds
-                if len(NikeThread.threads_products[(NikeThread.products_save_counter-1) * size : (NikeThread.products_save_counter) * size]) - size in range(-70, 70):
+                if len(NikeThread.products[(NikeThread.products_save_counter-1) * size : (NikeThread.products_save_counter) * size]) - size in range(-70, 70):
                     print("---->",NikeThread.products_save_counter, "/", (NikeThread.products_count // size)," ",  NikeThread.products_save_counter == (NikeThread.products_count // size))
-                    self.save_data(NikeThread.threads_products, file_name="products.json")
+                    self.save_data(NikeThread.products, file_name="products.json")
                     print("LEN reviews_url_data", len(NikeThread.threads_reviews_url))
                     NikeThread.products_save_counter += 1
 
                 else:
                     if len(NikeThread.threads_pages_url) == 0:
                         try:
-                            NikeThread.save_data(NikeThread.threads_products, file_name=f"products.json")
+                            NikeThread.save_data(NikeThread.products, file_name=f"products.json")
                         except:
                             print("ERROR in func:<run> 1")
             
 
-            # case TYPES.SET_REVIEW:
-            #     self.set_reviews_url()
+            case TYPES.SET_REVIEW:
+                self.set_reviews_url()
+
 
             case TYPES.REVIEW:
                 if len(NikeThread.threads_reviews_url) > 0:
                     self.retrive_review()
-                    print("retrive reviews: ", len(NikeThread.threads_reviews))
-
+                    print("retrive reviews: ", len(NikeThread.reviews))
+                
 
             case TYPES.SAVE_REVIEW:
                 r_size = 500
                 # if len(NikeThread.threads_reviews) >= r_size:
-                if len(NikeThread.threads_reviews[(NikeThread.reviews_save_counter-1) * r_size : (NikeThread.reviews_save_counter) * r_size]) - r_size in range(-70, 70):
+                if len(NikeThread.reviews[(NikeThread.reviews_save_counter-1) * r_size : (NikeThread.reviews_save_counter) * r_size]) - r_size in range(-70, 70):
                     print("savin reviews...")
-                    self.save_data(NikeThread.threads_reviews, file_name="reviews.json")
+                    self.save_data(NikeThread.reviews, file_name="reviews.json")
                     NikeThread.reviews_save_counter += 1
                     print("------------------------SAVED------------------------")
                 else:
                     if len(NikeThread.threads_reviews_url) == 0:
                         try:
-                            NikeThread.save_data(NikeThread.threads_reviews, file_name="reviews.json")
+                            NikeThread.save_data(NikeThread.reviews, file_name="reviews.json")
                         except:
                             print("ERROR in func:<run> 2")                
 

@@ -8,14 +8,7 @@ if __name__ == "__main__":
     threads: list = []
     products_to_save: list = []
 
-    for i in range(2):
-        set_products_thread = Th.NikeThread(
-            t_id=1,
-            t_type=Th.TYPES.SET_PAGES,
-            t_catch = None
-        )
-        set_products_thread.start()
-        set_products_thread.join()
+
 
     threads_pages_url = nikeThread.threads_pages_url
 
@@ -24,6 +17,15 @@ if __name__ == "__main__":
     while True:
 
         t_id += 1
+
+        for i in range(2):
+            set_products_thread = Th.NikeThread(
+                t_id=1,
+                t_type=Th.TYPES.SET_PAGES,
+                t_catch = None
+            )
+            set_products_thread.start()
+            set_products_thread.join()
 
         if threads_pages_url:
             for _ in range(7):
@@ -44,19 +46,19 @@ if __name__ == "__main__":
             print("no page added !")  
         time.sleep(1)
 
-        # for _ in range(4):
-        #     if nikeThread.products:
-        #         # print("main: threads_review_products: ", len(nikeThread.threads_review_products))
+        for _ in range(4):
+            if nikeThread.products:
+                # print("main: threads_review_products: ", len(nikeThread.threads_review_products))
 
-        #         set_review_thread = Th.NikeThread(
-        #             t_id=t_id,
-        #             t_type=Th.TYPES.SET_REVIEW,
-        #             t_catch = None
-        #         )
-        #         set_review_thread.start()
-        #     else:
-        #         pass
-        # time.sleep(0.2)
+                set_review_thread = Th.NikeThread(
+                    t_id=t_id,
+                    t_type=Th.TYPES.SET_REVIEW,
+                    t_catch = None
+                )
+                set_review_thread.start()
+            else:
+                pass
+        time.sleep(0.2)
         
         # for i in range(len(nikeThread.threads_reviews_url)):
         for i in range(200):
