@@ -1,0 +1,173 @@
+# #TODO:
+# @staticmethod
+# def is_id_exist(product_id):
+#     ids = []
+#     file = "ids.json"
+#     is_exist = False
+#     if os.path.exists(file):
+#         file_contents = NikeThread.load_data(file)
+#         ids.extend(file_contents)
+
+#         if product_id in file_contents:
+#             print(f"ID<{product_id}> is exist!")
+#             is_exist = True
+
+#     ids.append(product_id)
+#     with open(file, "w") as f:
+#         json.dump(ids, f)
+#     return is_exist
+
+#------------------------------------------------------------
+
+# pages_count = 4
+# products_count = 35
+# steps = [i for i in range(products_count)]
+
+# x = 0
+# for i in range(0, (pages_count *10), len(steps[x: x+10])):
+#     print(i + len(steps[x: x+10]))
+#     # print("i: ", i)
+#     x += 10
+# print(steps)
+
+#------------------------------------------------------------
+
+# ids = [1, 2, 3, 4, 1 , 2, 3, 3, 4]
+
+# ids2 = [2, 2, 6, 7]
+
+# # ids = list(set(ids.extend(ids2)))
+
+# ids.extend(ids2)
+# ids = list(set(ids))
+# print(ids)
+
+#------------------------------------------------------------
+
+# x = 6833
+
+# print(x // 500)
+
+# def foo(nums: list):
+#     return set([sorted(nums).count(i) for i in sorted(nums)]) == {1}
+
+# nums = [1, 2, 3, 4,1, 4]
+
+# print(foo(nums))
+
+#-------------------------------------------------------------
+# from urllib import request
+# import requests
+# import threading
+# import time
+# import asyncio
+# from time import perf_counter
+# import aiohttp
+# s = requests.Session()
+
+# urls = [
+#     "https://cdn-ws.turnto.com/v5/sitedata/78GDJmj4zEDYwwHsite/BV1021/d/review/en_GB/0/200/%7B%7D/LOCAL/true/true/?"
+#     for _ in range(60)
+# ]
+
+# # def simple_request(url):
+# #     response = requests.get(url)
+# #     print(response.status_code)
+
+
+# threads = []
+
+# # for i in urls:
+# #     url = urls.pop()
+# #     t1 = threading.Thread(target=simple_request, args=(url, ))
+# #     threads.append(t1)
+# #     t1.start()
+
+
+# def get_without_session(url):
+#     response = requests.get(url)
+#     print(response.status_code)
+
+# def get_with_session(url):
+#     response = s.get(url)
+#     print(response.status_code)
+
+
+# if __name__ == "__main__":
+
+#     s = requests.Session()
+#     start = time.time()
+#     for i in range(len(urls)):
+#         url = urls.pop()
+#         t1 = threading.Thread(target=get_with_session, args=(url, ))
+
+#         t1.start()
+#         threads.append(t1)
+    
+#     for thread in threads:
+#         thread.join()
+
+
+#     end = time.time()
+#     print("time: ", end - start)
+
+
+#-------------------------------------------------------------
+# import json
+
+# class Writer:
+#     import threading, queue
+#     def __init__(self, file_name):
+#         self.fname = file_name
+#         self.buf = []
+#         self.q = self.queue.Queue(128)
+#         self.t = self.threading.Thread(
+#             target = self._fileWrite)
+#         self.t.start()
+
+#     def finish(self):
+#         self.q.put(self.buf)
+#         self.buf = []
+#         self.q.put(None)
+#         self.t.join()
+
+#     def write(self, obj):
+#         self.buf.append(obj)
+#         if len(self.buf) >= 50_000:
+#             self.q.put(self.buf)
+#             self.buf = []
+
+#     def _fileWrite(self):
+#         with open(self.fname, 'wb') as f:
+#             while True:
+#                 buf = self.q.get()
+#                 if buf is None:
+#                     break
+#                 data = b''
+#                 for e in buf:
+#                     data += e.encode('ascii')
+#                 f.write(data)
+
+# # Example of usage
+
+# with open("products.json", "r") as f:
+#     content = f.read()
+
+# writer = Writer('out.json')
+# for i in range(1_00):
+#     writer.write(content)
+# writer.finish()
+
+# import os
+# print('Resulting file size:', os.path.getsize('out.json'))
+
+
+
+
+#-------------------------------------------------------------
+l = []
+
+if l:
+    print("yes")
+else:
+    print("no")
