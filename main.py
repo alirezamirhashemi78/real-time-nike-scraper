@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
 
 
-    threads_pages_url = nikeThread.threads_pages_url
+    pages_url = nikeThread.pages_url
 
 
 
@@ -28,10 +28,10 @@ if __name__ == "__main__":
             set_urls_thread.join()
 
 
-        if threads_pages_url:
+        if pages_url:
             for _ in range(10):
-                if threads_pages_url:
-                    page_url = threads_pages_url.pop()
+                if pages_url:
+                    page_url = pages_url.pop()
                     # print(page_url)
                     retrive_thread = Th.NikeThread(
                         t_id=2,
@@ -51,7 +51,6 @@ if __name__ == "__main__":
         # for setting the reviews url:
         for _ in range(4):
             if nikeThread.products:
-                # print("main: threads_review_products: ", len(nikeThread.threads_review_products))
                 set_urls_thread = Th.NikeThread(
                     t_id=1,
                     t_type=Th.TYPES.SET_URL,
@@ -65,8 +64,8 @@ if __name__ == "__main__":
         
 
         for i in range(200):
-            if nikeThread.threads_reviews_url:
-                obj = nikeThread.threads_reviews_url.pop()
+            if nikeThread.reviews_url:
+                obj = nikeThread.reviews_url.pop()
                 retrive_thread = Th.NikeThread(
                     t_id = 3,
                     t_type = Th.TYPES.RETRIVE,
