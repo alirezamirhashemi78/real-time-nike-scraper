@@ -1,11 +1,10 @@
 import enum
 import json
 
-from operator import le
+
 import os
 import requests
 import threading
-import time
 import math
 from typing import Any
 from fake_useragent import UserAgent
@@ -13,21 +12,38 @@ import orjson
 
 class TYPES(enum.Enum):
     NONE = 0
+
+    # for set all url that need to noctinue the process!
+    # products_count, threads_pages_url, products_url, reviews_url
     SET_URL = 1
-    PRODUCT = 2
+
+    RETRIVE = 2
+    # PRODUCT = 2
     REVIEW = 3
-    SAVE_REVIEW = 4
-    SET_REVIEW = 5
+    SAVE = 4
+ 
 
 class NikeThread(threading.Thread):
+
     t_id: int = 0
     t_type: TYPES = TYPES.NONE
     t_catch: Any = None
-    products_save_counter: int = 1
-    reviews_save_counter: int = 1
+
     is_record_finished: bool = False
     is_saving_finished: bool = False
     is_first_record: bool = True
+
+    products_save_counter: int = 1
+    reviews_save_counter: int = 1
+    products_count: int = 0
+
+    threads_pages_url: list = []
+    threads_review_products: list = []
+    threads_reviews_url: list = []
+    products_id: list = []
+    products: list = []
+    reviews: list = []
+
     headers = {
         'authority': 'www.nike.com',
         'accept': '*/*',
@@ -36,19 +52,13 @@ class NikeThread(threading.Thread):
         'user-agent': 'PostmanRuntime/7.35.0',
     }
 
-    session = requests.Session()
+    session = None
 
     anchor: int = 0
     count: int = 48
     products_api_url: str = "https://api.nike.com/cic/browse/v2?queryid=products&anonymousId=5E48B6B609950906C05E0BAE3406ABE4&country=at&endpoint=%2Fproduct_feed%2Frollup_threads%2Fv2%3Ffilter%3Dmarketplace(AT)%26filter%3Dlanguage(en-GB)%26filter%3DemployeePrice(true)%26anchor%3D{anchor}%26consumerChannelId%3Dd9a5bc42-4b9c-4976-858a-f159cf99c647%26count%3D{count}&language=en-GB&localizedRangeStr=%7BlowestPrice%7D%E2%80%94%7BhighestPrice%7D"
 
-    products_count: int = 0
-    threads_pages_url: list = []
-    threads_review_products: list = []
-    threads_reviews_url: list = []
-    products_id: list = []
-    products: list = []
-    reviews: list = []
+
 
 
 
@@ -148,6 +158,7 @@ class NikeThread(threading.Thread):
         match self.t_type:
 
             case TYPES.SET_URL:
+
                 if NikeThread.products_count == 0:
                     self.set_products_count()
                     print("P COUNT: ", NikeThread.products_count)
@@ -159,39 +170,40 @@ class NikeThread(threading.Thread):
                     self.set_reviews_url()
                     
 
-            case TYPES.PRODUCT:
-                self.retrive_product()
+            case TYPES.RETRIVE:
+                
+                if self.t_id == 2:
+                    self.retrive_product()
+                
 
-                size = 500
+                if self.t_id == 3:
+                    if len(NikeThread.threads_reviews_url) > 0:
+                        self.retrive_review()
+                        print("retrive reviews: ", len(NikeThread.reviews))       
+                    else:
+                        print("no reviews available!!")           
+            
+
+            case TYPES.SAVE:
+
+                # products:
                 # creating template size with range 140 for saving each 1000 product (the number is changable by variable 'size')
                 # i had to add range to it because the absoulute size  may passed by the threades cause of their speeds
+                size = 500
                 if len(NikeThread.products[(NikeThread.products_save_counter-1) * size : (NikeThread.products_save_counter) * size]) - size in range(-70, 70):
                     print("---->",NikeThread.products_save_counter, "/", (NikeThread.products_count // size)," ",  NikeThread.products_save_counter == (NikeThread.products_count // size))
                     self.save_data(NikeThread.products, file_name="products.json")
                     print("LEN reviews_url_data", len(NikeThread.threads_reviews_url))
                     NikeThread.products_save_counter += 1
-
                 else:
                     if len(NikeThread.threads_pages_url) == 0:
                         try:
                             NikeThread.save_data(NikeThread.products, file_name=f"products.json")
                         except:
                             print("ERROR in func:<run> 1")
-            
 
-            # case TYPES.SET_REVIEW:
-            #     self.set_reviews_url()
-
-
-            case TYPES.REVIEW:
-                if len(NikeThread.threads_reviews_url) > 0:
-                    self.retrive_review()
-                    print("retrive reviews: ", len(NikeThread.reviews))
-                
-
-            case TYPES.SAVE_REVIEW:
+                # reviews:
                 r_size = 500
-                # if len(NikeThread.threads_reviews) >= r_size:
                 if len(NikeThread.reviews[(NikeThread.reviews_save_counter-1) * r_size : (NikeThread.reviews_save_counter) * r_size]) - r_size in range(-70, 70):
                     print("savin reviews...")
                     self.save_data(NikeThread.reviews, file_name="reviews.json")
@@ -202,5 +214,6 @@ class NikeThread(threading.Thread):
                         try:
                             NikeThread.save_data(NikeThread.reviews, file_name="reviews.json")
                         except:
-                            print("ERROR in func:<run> 2")                
+                            print("ERROR in func:<run> 2")  
+            
 

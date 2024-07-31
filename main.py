@@ -1,6 +1,6 @@
 import time
 import random
-from urllib import request 
+import requests
 import NikeThread as Th
 
 if __name__ == "__main__":
@@ -13,13 +13,12 @@ if __name__ == "__main__":
     threads_pages_url = nikeThread.threads_pages_url
 
 
-    t_id = 0
-    while True:
 
-        t_id += 1
+    while True:
+        Th.NikeThread.session = requests.Session()
 
         # for setting pages url and pages count
-        for i in range(3):
+        for i in range(4):
             set_urls_thread = Th.NikeThread(
                 t_id=1,
                 t_type=Th.TYPES.SET_URL,
@@ -30,18 +29,18 @@ if __name__ == "__main__":
 
 
         if threads_pages_url:
-            for _ in range(7):
+            for _ in range(10):
                 if threads_pages_url:
                     page_url = threads_pages_url.pop()
                     # print(page_url)
-                    retrive_product_thread = Th.NikeThread(
-                        t_id=t_id,
-                        t_type=Th.TYPES.PRODUCT,
+                    retrive_thread = Th.NikeThread(
+                        t_id=2,
+                        t_type=Th.TYPES.RETRIVE,
                         t_catch = page_url
                     )
-                    retrive_product_thread.start()
-                    threads.append(retrive_product_thread)
-                    time.sleep(0.6)
+                    retrive_thread.start()
+                    threads.append(retrive_thread)
+                    time.sleep(0.3)
                 else:
                     break
         else:
@@ -68,27 +67,30 @@ if __name__ == "__main__":
         for i in range(200):
             if nikeThread.threads_reviews_url:
                 obj = nikeThread.threads_reviews_url.pop()
-                retrive_review_thread = Th.NikeThread(
-                    t_id = t_id,
-                    t_type = Th.TYPES.REVIEW,
+                retrive_thread = Th.NikeThread(
+                    t_id = 3,
+                    t_type = Th.TYPES.RETRIVE,
                     t_catch = obj
                 )
-                retrive_review_thread.start()
-                s = random.choice([0, 0.1, 0.2])
+                retrive_thread.start()
+                # s = random.choice([0, 0.1])
                 # time.sleep(s)
             else:
                 print("naaaa")
                 break
+
         
-        if nikeThread.threads_reviews_url:
-            save_review_thread = Th.NikeThread(
-                    t_id = t_id,
-                    t_type = Th.TYPES.SAVE_REVIEW,
+
+        # have to bee at least more than 2 threads
+        # because it handles two operation of save
+        # 1.saving products 2.saving reviews
+        for _ in range(2):
+            save_thread = Th.NikeThread(
+                    t_id = 0,
+                    t_type = Th.TYPES.SAVE,
                     t_catch = None
                 )
-            save_review_thread.start()
-        else:
-            print("no reviews available!!")
+            save_thread.start()
 
             
 
