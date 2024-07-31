@@ -13,14 +13,17 @@ import orjson
 class TYPES(enum.Enum):
     NONE = 0
 
-    # for set all url that need to noctinue the process!
-    # products_count, pages_url, products_url, reviews_url
+    # for set all urls that process need to coctinue in the lists!
+    # 1.products_count, 2.pages_url, 3.products_url, 4.reviews_url
     SET_URL = 1
 
+    # request and retrive all items
+    # 1.products,  2.reviews
     RETRIVE = 2
-    # PRODUCT = 2
-    REVIEW = 3
-    SAVE = 4
+
+    # save all item that recived and stored in lists to json files
+    # 1.product, 2.reviews
+    SAVE = 3
  
 
 class NikeThread(threading.Thread):
