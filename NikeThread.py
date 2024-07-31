@@ -5,6 +5,7 @@ import json
 import os
 import requests
 import threading
+import multiprocessing
 import math
 from typing import Any
 from fake_useragent import UserAgent
@@ -29,6 +30,7 @@ class TYPES(enum.Enum):
 class NikeThread(threading.Thread):
 
     t_id: int = 0
+    t_name: str = ""
     t_type: TYPES = TYPES.NONE
     t_catch: Any = None
 
@@ -67,10 +69,11 @@ class NikeThread(threading.Thread):
     def __init__(
         self, group=None, 
         target=None, name=None, args=(), kwargs=None, *, daemon=None,
-        t_id, t_type, t_catch:Any):
+        t_id, t_name, t_type, t_catch:Any):
 
         super().__init__(group, target, name, args, kwargs, daemon=daemon)
         self.t_id = t_id
+        self.t_name = t_name
         self.t_type = t_type
         self.t_catch = t_catch
 
@@ -174,11 +177,11 @@ class NikeThread(threading.Thread):
 
             case TYPES.RETRIVE:
                 
-                if self.t_id == 2:
+                if self.t_name == "products":
                     self.retrive_product()
                 
 
-                if self.t_id == 3:
+                if self.t_name == "reviews":
                     if len(NikeThread.reviews_url) > 0:
                         self.retrive_review()
                         print("retrive reviews: ", len(NikeThread.reviews))       
@@ -191,6 +194,7 @@ class NikeThread(threading.Thread):
                 # products:
                 # creating template size with range 140 for saving each 1000 product (the number is changable by variable 'size')
                 # i had to add range to it because the absoulute size  may passed by the threades cause of their speeds
+        
                 size = 500
                 if len(NikeThread.products[(NikeThread.products_save_counter-1) * size : (NikeThread.products_save_counter) * size]) - size in range(-70, 70):
                     print("---->",NikeThread.products_save_counter, "/", (NikeThread.products_count // size)," ",  NikeThread.products_save_counter == (NikeThread.products_count // size))
@@ -203,6 +207,8 @@ class NikeThread(threading.Thread):
                             NikeThread.save_data(NikeThread.products, file_name=f"products.json")
                         except:
                             print("ERROR in func:<run> 1")
+                
+
 
                 # reviews:
                 r_size = 500

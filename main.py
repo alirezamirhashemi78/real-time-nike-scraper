@@ -1,10 +1,37 @@
+from ast import arg
 import time
 import random
 import requests
 import NikeThread as Th
+import multiprocessing 
+
+# def operate_save_threads(process_args: list):
+
+#     data = {"products": process_args[0], "reviews": process_args[1]}
+#     print(len(data["products"]))
+#     for _ in range(2):
+#         save_thread = Th.NikeThread(
+#                 t_id = 0,
+#                 t_name="",
+#                 t_type = Th.TYPES.SAVE,
+#                 t_catch = data
+#             )
+#         save_thread.start()
+
+def operate_save_threads():
+
+    for _ in range(2):
+        save_thread = Th.NikeThread(
+                t_id = 0,
+                t_name="",
+                t_type = Th.TYPES.SAVE,
+                t_catch = None
+            )
+        save_thread.start()
+
 
 if __name__ == "__main__":
-    nikeThread = Th.NikeThread(t_id=0, t_type=Th.TYPES.NONE, t_catch=None)
+    nikeThread = Th.NikeThread(t_id=0, t_name="", t_type=Th.TYPES.NONE, t_catch=None)
     threads: list = []
     products_to_save: list = []
 
@@ -21,6 +48,7 @@ if __name__ == "__main__":
         for i in range(4):
             set_urls_thread = Th.NikeThread(
                 t_id=1,
+                t_name="",
                 t_type=Th.TYPES.SET_URL,
                 t_catch = None
             )
@@ -35,6 +63,7 @@ if __name__ == "__main__":
                     # print(page_url)
                     retrive_thread = Th.NikeThread(
                         t_id=2,
+                        t_name="products",
                         t_type=Th.TYPES.RETRIVE,
                         t_catch = page_url
                     )
@@ -53,6 +82,7 @@ if __name__ == "__main__":
             if nikeThread.products:
                 set_urls_thread = Th.NikeThread(
                     t_id=1,
+                    t_name="",
                     t_type=Th.TYPES.SET_URL,
                     t_catch = None
                 )
@@ -68,6 +98,7 @@ if __name__ == "__main__":
                 obj = nikeThread.reviews_url.pop()
                 retrive_thread = Th.NikeThread(
                     t_id = 3,
+                    t_name="reviews",
                     t_type = Th.TYPES.RETRIVE,
                     t_catch = obj
                 )
@@ -83,13 +114,9 @@ if __name__ == "__main__":
         # have to bee at least more than 2 threads
         # because it handles two operation of save
         # 1.saving products 2.saving reviews
-        for _ in range(2):
-            save_thread = Th.NikeThread(
-                    t_id = 0,
-                    t_type = Th.TYPES.SAVE,
-                    t_catch = None
-                )
-            save_thread.start()
+        # save_process = multiprocessing.Process(target=operate_save_threads, args=( [Th.NikeThread.products, Th.NikeThread.reviews], )) 
+        # save_process.start()
+        operate_save_threads()
 
             
 
