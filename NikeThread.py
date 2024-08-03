@@ -87,6 +87,7 @@ class NikeThread(threading.Thread):
 
     @staticmethod
     def save_data(data, file_name):
+        # print("==========LEN ARGS: ============", len(data))
         if NikeThread.is_first_record:
             pass
         else:
@@ -196,6 +197,7 @@ class NikeThread(threading.Thread):
                 # i had to add range to it because the absoulute size  may passed by the threades cause of their speeds
         
                 size = 500
+
                 if len(NikeThread.products[(NikeThread.products_save_counter-1) * size : (NikeThread.products_save_counter) * size]) - size in range(-70, 70):
                     print("---->",NikeThread.products_save_counter, "/", (NikeThread.products_count // size)," ",  NikeThread.products_save_counter == (NikeThread.products_count // size))
                     self.save_data(NikeThread.products, file_name="products.json")
@@ -205,13 +207,14 @@ class NikeThread(threading.Thread):
                     if len(NikeThread.pages_url) == 0:
                         try:
                             NikeThread.save_data(NikeThread.products, file_name=f"products.json")
+
                         except:
                             print("ERROR in func:<run> 1")
                 
 
 
                 # reviews:
-                r_size = 500
+                r_size = 300
                 if len(NikeThread.reviews[(NikeThread.reviews_save_counter-1) * r_size : (NikeThread.reviews_save_counter) * r_size]) - r_size in range(-70, 70):
                     print("savin reviews...")
                     self.save_data(NikeThread.reviews, file_name="reviews.json")
@@ -221,7 +224,9 @@ class NikeThread(threading.Thread):
                     if len(NikeThread.reviews_url) == 0:
                         try:
                             NikeThread.save_data(NikeThread.reviews, file_name="reviews.json")
+
                         except:
                             print("ERROR in func:<run> 2")  
-            
+
+
 

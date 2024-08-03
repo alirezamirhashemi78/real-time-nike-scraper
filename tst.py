@@ -165,9 +165,36 @@
 
 
 #-------------------------------------------------------------
-l = []
+from ast import arg
+import multiprocessing
+import threading
 
-if l:
-    print("yes")
-else:
-    print("no")
+
+numbers = []
+results = []
+
+def add_to_numbers(numbers):
+    num = len(numbers)
+    while True:
+        if len(numbers) > 100:
+            break
+        numbers.append(num)
+        num += 1
+    
+def operate_numbers():
+    for _ in range(len(numbers)):
+        num = numbers.pop()
+        results.append(num * 2)
+
+if __name__ == "__main__":
+    with multiprocessing.Manager() as manager:
+
+        p1 = multiprocessing.Process(target=add_to_numbers, args=(numbers, ))
+        # p2 = multiprocessing.Process(target=operate_numbers, args=(numbers, ))
+        p1.start()
+        # p2.start()
+        p1.join()
+        # p2.join()
+        operate_numbers()
+        print(numbers)
+        print(results)
