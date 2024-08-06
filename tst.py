@@ -165,36 +165,135 @@
 
 
 #-------------------------------------------------------------
-from ast import arg
-import multiprocessing
-import threading
+# import multiprocessing
+# import threading
 
 
-numbers = []
-results = []
+# numbers = []
+# results = []
 
-def add_to_numbers(numbers):
-    num = len(numbers)
-    while True:
-        if len(numbers) > 100:
-            break
-        numbers.append(num)
-        num += 1
+# def add_to_numbers(numbers):
+#     num = len(numbers)
+#     while True:
+#         if len(numbers) > 100:
+#             break
+#         numbers.append(num)
+#         num += 1
     
-def operate_numbers():
-    for _ in range(len(numbers)):
-        num = numbers.pop()
-        results.append(num * 2)
+# def operate_numbers():
+#     for _ in range(len(numbers)):
+#         num = numbers.pop()
+#         results.append(num * 2)
 
-if __name__ == "__main__":
-    with multiprocessing.Manager() as manager:
+# if __name__ == "__main__":
+#     with multiprocessing.Manager() as manager:
 
-        p1 = multiprocessing.Process(target=add_to_numbers, args=(numbers, ))
-        # p2 = multiprocessing.Process(target=operate_numbers, args=(numbers, ))
-        p1.start()
-        # p2.start()
-        p1.join()
-        # p2.join()
-        operate_numbers()
-        print(numbers)
-        print(results)
+#         p1 = multiprocessing.Process(target=add_to_numbers, args=(numbers, ))
+#         # p2 = multiprocessing.Process(target=operate_numbers, args=(numbers, ))
+#         p1.start()
+#         # p2.start()
+#         p1.join()
+#         # p2.join()
+#         operate_numbers()
+#         print(numbers)
+#         print(results)
+
+
+#-------------------------------------------------------------
+# from ast import arg
+# import multiprocessing
+# import threading
+# from time import time
+# from tkinter import W
+# from types import FunctionType
+
+
+# numbers = [_ for _ in range(1, 10)]
+
+
+# new_numbers = []
+
+
+# def _sum():
+#     s = 0
+#     for i in numbers:
+#         s += i
+#     print("S :", s)
+
+
+# def _mul():
+#     m = 1
+#     for i in numbers: 
+#         m *= i
+#     print("M :", m)
+
+
+# def _add_numbers(args):
+#     ns = args["numbers"]
+#     q = args["queue"]
+#     for n in ns:
+#         q.put(n)
+
+# def _print_new_numbers(new_numbers):
+#     print(":man injam", len(new_numbers))
+#     for i in new_numbers:
+#         print(i+2, end=", ")
+
+
+# def multi_function_process_runer(args):
+#     functions = args["functions"]
+#     inputs = args["inputs"]
+#     for func in functions:
+#         try:
+#             func(inputs[func])
+#         except:
+#             func()
+
+
+
+# # process_runer(_sum, _mul)
+# if __name__ == '__main__':
+#     q = multiprocessing.Queue()
+#     args = {
+#         "functions": (_add_numbers, _sum, _mul), 
+#         "inputs": {
+#             _add_numbers: {"numbers": numbers, 'queue': q},
+#         }
+#     }
+
+
+#     p1 = multiprocessing.Process(target=multi_function_process_runer, args=(args, ))
+
+#     p1.start()
+
+#     p1.join()
+    
+#     while not q.empty():
+#         new_numbers.append(q.get())
+#     print("new_numbers: ", new_numbers)
+    
+
+#     p2 = multiprocessing.Process(target=_print_new_numbers, args=(new_numbers, ))
+#     p2.start()
+#     p2.join()
+
+
+#-------------------------------------------------------------
+import json
+import ujson
+import time
+
+with open("products.json", "r") as file:
+    content = ujson.loads(file.read())
+
+s = time.time()
+with open("p.json", "w") as file:
+    json.dump(content, file)
+e = time.time()
+print("JSON: ", len(content),  "data in ", e-s, "s" )
+
+s = time.time()
+with open("p_ujson.json", "w") as file:
+    ujson.dump(content, file)
+e = time.time()
+print("uJSON: ", len(content),  "data in ", e-s, "s" )
